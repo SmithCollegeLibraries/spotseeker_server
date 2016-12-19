@@ -32,6 +32,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.files.uploadedfile import UploadedFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.utils import timezone
 import hashlib
 import datetime
 import time
@@ -159,6 +160,8 @@ class Spot(models.Model):
                 "room_number": self.room_number,
             },
             "capacity": self.capacity,
+            "occupied": self.occupied(),
+            "full": self.full(),
             "display_access_restrictions":
             self.display_access_restrictions,
             "images": images,
@@ -197,6 +200,14 @@ class Spot(models.Model):
             ei.value = data['count']
             ei.save()
 
+    def occupied(self):
+        now = timezone.now()
+        aggregate = self.occupancy_set.filter(start_time__lte=now, end_time__gte=now).aggregate(Sum('students'))
+        return aggregate.values()[0]
+
+    def full(self):
+        return self.occupied() >= self.capacity
+
     def delete(self, *args, **kwargs):
         self.invalidate_cache()
         super(Spot, self).delete(*args, **kwargs)
@@ -207,6 +218,23 @@ class Spot(models.Model):
             return cls.objects.get(external_id=spot_id[9:])
         else:
             return cls.objects.get(pk=spot_id)
+
+class Occupancy(models.Model):
+    """ Represents the occupancy of a space by one or more students
+    """
+    spot = models.ForeignKey(Spot, on_delete=models.CASCADE)
+
+    # student = models.CharField(max_length=100)
+    students = models.IntegerField()
+    minutes = models.IntegerField()
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.start_time = timezone.now()
+            self.end_time = self.start_time + datetime.timedelta(minutes=self.minutes)
+        super(Occupancy, self).save(*args, **kwargs)
 
 
 class FavoriteSpot(models.Model):
