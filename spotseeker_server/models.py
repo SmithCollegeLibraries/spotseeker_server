@@ -112,6 +112,8 @@ class Spot(models.Model):
         # version.
         cached_entry = cache.get(self.pk)
         if cached_entry and cached_entry['etag'] == self.etag:
+            # inject live occupancy into cached content
+            cached_entry["occupied"] = self.occupied()
             return cached_entry
 
         extended_info = {}
@@ -161,7 +163,6 @@ class Spot(models.Model):
             },
             "capacity": self.capacity,
             "occupied": self.occupied(),
-            "full": self.full(),
             "display_access_restrictions":
             self.display_access_restrictions,
             "images": images,
@@ -205,9 +206,6 @@ class Spot(models.Model):
         aggregate = self.occupancy_set.filter(start_time__lte=now, end_time__gte=now).aggregate(Sum('students'))
         return aggregate.values()[0]
 
-    def full(self):
-        return self.occupied() >= self.capacity
-
     def delete(self, *args, **kwargs):
         self.invalidate_cache()
         super(Spot, self).delete(*args, **kwargs)
@@ -223,13 +221,12 @@ class Occupancy(models.Model):
     """ Represents the occupancy of a space by one or more students
     """
     spot = models.ForeignKey(Spot, on_delete=models.CASCADE)
-
-    # student = models.CharField(max_length=100)
     students = models.IntegerField()
     minutes = models.IntegerField()
-    start_time = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
+    # TODO: prevent occupancy > capacity
     def save(self, *args, **kwargs):
         if not self.pk:
             self.start_time = timezone.now()
