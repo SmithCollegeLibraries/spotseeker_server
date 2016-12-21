@@ -16,6 +16,8 @@ class Migration(SchemaMigration):
             ('minutes', self.gf('django.db.models.fields.IntegerField')()),
             ('start_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('end_time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('upload_user', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('upload_application', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
         db.send_create_signal('spotseeker_server', ['Occupancy'])
 
@@ -118,7 +120,9 @@ class Migration(SchemaMigration):
             'minutes': ('django.db.models.fields.IntegerField', [], {}),
             'students': ('django.db.models.fields.IntegerField', [], {}),
             'spot': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['spotseeker_server.Spot']"}),
-            'start_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+            'start_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'upload_application': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'upload_user': ('django.db.models.fields.CharField', [], {'max_length': '40'})
         },
         'spotseeker_server.sharedspace': {
             'Meta': {'object_name': 'SharedSpace'},

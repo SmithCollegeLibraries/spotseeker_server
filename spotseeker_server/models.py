@@ -225,6 +225,8 @@ class Occupancy(models.Model):
     minutes = models.IntegerField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    upload_user = models.CharField(max_length=40)
+    upload_application = models.CharField(max_length=100)
 
     # TODO: prevent occupancy > capacity
     def save(self, *args, **kwargs):

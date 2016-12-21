@@ -26,6 +26,7 @@ from spotseeker_server.views.buildings import BuildingListView
 from spotseeker_server.views.spot import SpotView
 from spotseeker_server.views.search import SearchView
 from spotseeker_server.views.add_image import AddImageView
+from spotseeker_server.views.add_occupancy import AddOccupancyView
 from spotseeker_server.views.image import ImageView
 from spotseeker_server.views.thumbnail import ThumbnailView
 from spotseeker_server.views.null import NullView
@@ -58,6 +59,8 @@ urlpatterns = patterns('',
                            name='schema'),
                        url(r'v1/spot/(?P<spot_id>\d+)/image$',
                            csrf_exempt(AddImageView().run)),
+                       url(r'v1/spot/(?P<spot_id>\d+)/occupancy/$',
+                           csrf_exempt(AddOccupancyView().run)),
                        url(r'v1/spot/(?P<spot_id>\d+)/image/'
                            '(?P<image_id>\d+)$',
                            csrf_exempt(ImageView().run),
