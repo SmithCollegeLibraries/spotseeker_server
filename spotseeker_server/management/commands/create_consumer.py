@@ -60,7 +60,7 @@ class Command(BaseCommand):
         key = hashlib.sha1("{0} - {1}".format(random.random(),
                                               time.time())).hexdigest()
         secret = hashlib.sha1("{0} - {1}".format(random.random(),
-                                                 time.time())).hexdigest()
+                                                 time.time())).hexdigest()[:16]
 
         consumer = Consumer.objects.create(name=consumer_name,
                                            key=key,
