@@ -74,7 +74,7 @@ class Command(BaseCommand):
                 floor=floor,
                 room_number=room_number,
                 capacity=capacity,
-                display_access_restrictions=display_access_restrictions,
+                display_access_restrictions=("access_restrictions" if display_access_restrictions == "true" else ""),
                 manager=manager
                 )
 
@@ -113,6 +113,8 @@ class Command(BaseCommand):
                 spot.spotextendedinfo_set.create(key="reservable", value=reservable)
             if reservation_notes != "":
                 spot.spotextendedinfo_set.create(key="reservation_notes", value=reservation_notes)
+            if hours_notes != "":
+                spot.spotextendedinfo_set.create(key="hours_notes", value=hours_notes)
 
             for imagename in imagenames.split(', '):
                 image = open(os.path.join(options['imgdir'], imagename.strip()))
