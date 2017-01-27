@@ -204,7 +204,7 @@ class Spot(models.Model):
     def occupied(self):
         now = timezone.now()
         aggregate = self.occupancy_set.filter(start_time__lte=now, end_time__gte=now).aggregate(Sum('students'))
-        return aggregate.values()[0]
+        return aggregate.values()[0] or 0
 
     def delete(self, *args, **kwargs):
         self.invalidate_cache()
