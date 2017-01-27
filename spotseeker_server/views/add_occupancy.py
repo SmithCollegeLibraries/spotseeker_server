@@ -43,7 +43,10 @@ class AddOccupancyView(RESTDispatch):
         }
 
         if args['students'] != None and args['minutes'] != None:
-            occupancy = spot.occupancy_set.create(**args)
-            return HttpResponse(status=201)
+            if spot.occupied() + args['students'] > spot.capacity:
+                return HttpResponse(status=403)
+            else:
+                occupancy = spot.occupancy_set.create(**args)
+                return HttpResponse(status=201)
         else:
             return HttpResponse(status=404)
