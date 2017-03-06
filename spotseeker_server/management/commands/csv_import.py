@@ -116,9 +116,9 @@ class Command(BaseCommand):
             if hours_notes != "":
                 spot.spotextendedinfo_set.create(key="hours_notes", value=hours_notes)
 
-            for imagename in imagenames.split(', '):
+            for display_index, imagename in enumerate(imagenames.split(', ')):
                 image = open(os.path.join(options['imgdir'], imagename.strip()))
-                spot.spotimage_set.create(image=File(image))
+                spot.spotimage_set.create(image=File(image), display_index=display_index)
 
             for available_hour in available_hours.strip('"').split(', '):
                 (day, hours) = available_hour.split(': ')
