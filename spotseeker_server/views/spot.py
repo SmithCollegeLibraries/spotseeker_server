@@ -129,10 +129,11 @@ def _save_images(sender, **kwargs):
     if partial_update and images is None:
         return
 
-    for image in images:
-        spot_image = SpotImage.objects.get(pk=image['id'])
-        spot_image.description = image['description']
-        spot_image.save()
+    if images is not None:
+        for image in images:
+            spot_image = SpotImage.objects.get(pk=image['id'])
+            spot_image.description = image['description']
+            spot_image.save()
 
 
 @django.dispatch.receiver(
