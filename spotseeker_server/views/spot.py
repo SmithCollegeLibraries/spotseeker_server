@@ -48,6 +48,16 @@ def _build_available_hours(sender, **kwargs):
 
     stash['available_hours'] = json_values.pop('available_hours', None)
 
+@django.dispatch.receiver(
+    spot_pre_save,
+    dispatch_uid='spotseeker_server.views.spot.build_images')
+def _build_images(sender, **kwargs):
+    """Save the images for later"""
+    json_values = kwargs['json_values']
+    stash = kwargs['stash']
+
+    stash['images'] = json_values.pop('images', None)
+
 
 @django.dispatch.receiver(
     spot_pre_save,
@@ -103,6 +113,26 @@ def _save_available_hours(sender, **kwargs):
                     start_time=window[0],
                     end_time=window[1]
                 )
+
+
+@django.dispatch.receiver(
+    spot_post_save,
+    dispatch_uid='spotseeker_server.views.spot.save_images')
+def _save_images(sender, **kwargs):
+    """Sync the images for the spot"""
+    spot = kwargs['spot']
+    partial_update = kwargs['partial_update']
+    stash = kwargs['stash']
+
+    images = stash['images']
+
+    if partial_update and images is None:
+        return
+
+    for image in images:
+        spot_image = SpotImage.objects.get(pk=image['id'])
+        spot_image.description = image['description']
+        spot_image.save()
 
 
 @django.dispatch.receiver(
